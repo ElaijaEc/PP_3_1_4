@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" th:href="@{/css/application.css}">
+  <title>Auth</title>
+</head>
+<body class="bg-light">
+<div class="api-context d-none" id="login_page">
+  <div class="centered">
+    <h3>Please, sign in </h3>
+    <form name="login_form" id="login_form" method="post" action="#" onsubmit="set_login(); return false;">
+      <input type="text" name="username" placeholder="Login" id="username">
+      <input type="password" name="password" placeholder="Password" id="password">
+      <input class="btn btn-primary" type="submit" value="Sign in">
+    </form>
+    <div th:if="${param.error}" style="color: red">Неправильные имя и пароль</div>
+  </div>
+</div>
+<div class="api-context d-none" id="after_login">
+  <div class="modal fade" id="editingModal" tabindex="-1" role="dialog" aria-labelledby="editingModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editingModalTitle">Edit User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="editFormContainer">
+          <form id="editForm" action="#" method="get" onsubmit="fetch_edit(document.getElementById('editForm').elements.id.value); return false;">
+            <input type="hidden" name="id">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Login</label>
+                <input type="text" class="form-control" name="login">
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input type="text" class="form-control" name="password">
+              </div>
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" class="form-control" name="firstname">
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" name="lastName">
+              </div>
+              <div class="form-group">
+                <label> Age</label>
+                <input type="number" class="form-control" name="age">
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" name="email">
+              </div>
+              <div class="form-group">
+                <label for="authorities">Roles</label>
+                <select multiple class="form-control" name="authorities">
+                  <option value="ROLE_USER" selected>USER</option>
+                  <option value="ROLE_ADMIN">ADMIN</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <input type="submit" class="btn btn-primary" value="Edit">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deletingModal" tabindex="-1" role="dialog" aria-labelledby="deletingModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deletingModalTitle">Delete User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="deleteFormContainer">
+          <form id="deleteForm" action="#" method="get" onsubmit="fetch_delete(document.getElementById('deleteForm').elements.id.value); return false;" th:object="${user}">
+            <input type="hidden" name="id">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="username">Login</label>
+                <input type="text" class="form-control" disabled name="login" >
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="text" class="form-control" disabled name="password">
+              </div>
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" class="form-control" disabled name="firstName">
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" disabled name="lastName">
+              </div>
+              <div class="form-group">
+                <label>Age</label>
+                <input type="number" class="form-control" disabled name="Age">
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" disabled name="email" >
+              </div>
+              <div class="form-group">
+                <label for="authorities">Roles</label>
+                <select multiple class="form-control" disabled name="authorities" id="authorities">
+                  <option value="ROLE_USER" selected>USER</option>
+                  <option value="ROLE_ADMIN">ADMIN</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <input type="submit" class="btn btn-danger" value="Delete">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <header>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+      <p class="navbar-brand">
+        <b id="current_username"></b>
+        <span> with roles: </span>
+        <span id="current_roles"></span>
+      </p>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto logout">
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/logout}">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="left-menu bg-white">
+      <ul class="list-group" id="nav">
+        <li class="list-group-item list-group-item-action" id="admin_page_tab" onclick="get_admin_panel()">Admin</li>
+        <li class="list-group-item list-group-item-action" id="user_page_tab" onclick="get_user_page()">User</li>
+      </ul>
+    </div>
+    <div class="main-part" id="main">
+      <div class="api-context d-none" id="admin_page">
+        <h1>Admin panel</h1>
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" id="tab-1" href="#" onClick="change_admin_tab(1)">Users table</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab-2" href="#" onClick="change_admin_tab(2)">New User</a>
+          </li>
+        </ul>
+        <div class="border" id="js-tab-admin"></div>
+      </div>
+      <div class="api-context d-none" id="user_page">
+        <h1>User-information page</h1>
+        <div class="about_user_container border" id="js-tab-user">
+          <h6>About user</h6>
+          <div class="about_user_container_table">
+            <table class="table table-striped caption-top">
+              <tr>
+                <th>ID</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Login</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Roles</th>
+              </tr>
+              <tr id="current_user_info">
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script th:src="@{/js/login.js}"></script>
+<script th:src="@{/js/admin.js}"></script>
+<script th:src="@{/js/fetch.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

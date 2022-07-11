@@ -1,0 +1,98 @@
+#login_page div.centered {
+    margin: 30px auto;
+    width: fit-content;
+    max-width: 300px;
+}
+#login_page div.centered h3 {
+    display: inline-block;
+    font-weight: bold;
+}
+#login_page div.centered * {
+    width: 100%;
+}
+#login_page div.centered .btn {
+    margin-top: 5px;
+}
+
+
+ .navbar-brand {
+    display: inline;
+    height: min-content;
+}
+ .logout {
+    position: absolute;
+    right: 0;
+}
+ .navbar-brand {
+    margin: 0;
+    padding: 0;
+}
+main {
+    margin-top: 20px;
+    margin-right: 10%;
+}
+main .left-menu {
+    margin: 0;
+    width: 20%;
+    display: inline-block;
+    float:left;
+    max-width: 300px;
+    min-height: 80vh;
+}
+main .left-menu .list-group-item.list-group-item-action {
+    border: none;
+}
+main .main-part {
+    display: inline-block;
+    width: 75%;
+    float:right;
+}
+main .main-part h1 {
+    padding: 10px;
+}
+main .main-part h6 {
+    font-size: large;
+    display: block;
+    padding: 5px;
+}
+main .main-part  .inner-admin-panel div {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+main .main-part .inner-admin-panel div .table {
+    width: 96%;
+    margin: 0 2%;
+}
+main .main-part .inner-admin-panel div .table tr {
+    height: min-content;
+    padding: 0;
+}
+ #editForm {
+    text-align: center;
+}
+ #editForm label {
+    font-weight: bold;
+}
+.inner-admin-panel-add div {
+    background: white;
+}
+.main-part .inner-admin-panel-add form#js_new_user_form {
+    margin: 0 auto;
+    width: 40%;
+    max-width: 500px;
+}
+.main-part .inner-admin-panel-add form#js_new_user_form div{
+    margin: 0 auto;
+    text-align: center;
+}
+.main-part  .inner-admin-panel-add form#js_new_user_form label {
+    font-weight: bold;
+}
+.main-part .inner-admin-panel-add form#js_new_user_form .btn {
+    display: block;
+    width: 40%;
+    min-width: 80px;
+    margin: 10px auto;
+}
+
+
