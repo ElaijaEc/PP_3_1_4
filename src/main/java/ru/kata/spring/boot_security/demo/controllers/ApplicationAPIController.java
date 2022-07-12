@@ -1,7 +1,12 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
@@ -18,37 +23,32 @@ public class ApplicationAPIController {
         this.userService = userService;
     }
     @GetMapping(value = "/get_login")
-    public User getCurrentUser(){
-        if (SecurityContextHolder.getContext().getAuthentication()!=null){
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(principal instanceof User) {
-                return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            }
-        }
-        return new User();
+    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal User user) {
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.ok(new User());
     }
     @GetMapping(value = "/get_users_table")
-    public List<User> getUsersTable(){
-        return userService.getUserList();
+    ResponseEntity<List<User>> getUsersTable(){
+        return new ResponseEntity<>(userService.getUserList(), HttpStatus.OK);
     }
+
     @GetMapping(value = "/add_user")
-    public String addUser(@ModelAttribute User user){
+    ResponseEntity<User> addUser(@RequestBody User user){
         userService.addUser(user);
-        return "Success";
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
     @GetMapping(value = "/user/{id}")
-    public User getUser(@PathVariable Long id) {
-        return userService.getUser(id);
+    ResponseEntity<User> getUser(@PathVariable Long id) {
+        return new ResponseEntity<>(userService.getUser(id),HttpStatus.OK);
     }
     @GetMapping(value ="/delete_user/{id}")
-    public String deleteUser(@PathVariable Long id){
+    ResponseEntity<Long> deleteUser(@PathVariable Long id){
         userService.removeUser(id);
-        return "Success";
+        return ResponseEntity.ok(id);
     }
     @GetMapping(value ="/edit_user/{id}")
-    public String editUser(@PathVariable Long id,@ModelAttribute User user){
+    ResponseEntity<User>editUser(@PathVariable Long id,@RequestBody User user){
         userService.redactUser(id,user);
-        return "Success";
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
 
